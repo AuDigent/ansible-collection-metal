@@ -129,7 +129,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             :param group: the name of the group to which the hosts belong
         '''
         for host in hosts:
+            addrs = [i for i in filter(lambda x: x['public'] and x['cidr'] == 31, host['ip_addresses'])]
+
             hostname = host['hostname']
+            if len(addrs) != 0:
+                hostname = addrs[0]['address']
 
             self.inventory.add_host(hostname, group=group)
             for hostvar, hostval in host.items():
