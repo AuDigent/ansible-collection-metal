@@ -219,6 +219,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _connect(self):
         """create connection to api server"""
+        print(self.api_token)
         manager = packet.Manager(
             auth_token=str(self.api_token),
             consumer_token="ansible-equinix-metal-inventory",
