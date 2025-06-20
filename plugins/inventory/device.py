@@ -108,6 +108,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         :param path: the path to the inventory config file
         :return the contents of the config file
         """
+        print("hello world")
+
         if super(InventoryModule, self).verify_file(path):
             if path.endswith(("equinix_metal.yml", "equinix_metal.yaml")):
                 return True
@@ -219,7 +221,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _connect(self):
         """create connection to api server"""
-        print(self.api_token)
         manager = packet.Manager(
             auth_token=str(self.api_token),
             consumer_token="ansible-equinix-metal-inventory",
