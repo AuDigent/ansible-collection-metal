@@ -268,6 +268,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         :return A list of device dictionaries
         """
         try:
+            print(project_id)
             manager = self._connect()
             devices = manager.list_all_devices(project_id=project_id)
             return [self._get_host_info_dict_from_device(device) for device in devices]
