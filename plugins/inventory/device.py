@@ -250,7 +250,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 self.display.warn(len(pages))
                 # projects = manager.list_projects()
                 # project_ids = [project.id for project in projects]
-            except Exception as e:
+            except ImportError as e:
                 raise AnsibleError(
                     "Failed to query projects from Equinix Metal API", orig_exc=e
                 )
