@@ -237,7 +237,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if data["meta"]["next"] is None:
                 next_url = None
             else:
-                next_url = f"{base_url}{data['meta']['next']['href']}"
+                # next_url = f"{base_url}{data['meta']['next']['href']}"
+                next_url = None
             # yield the page, let the caller handle the results
             yield (data)
 
