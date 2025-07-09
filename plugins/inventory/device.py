@@ -109,12 +109,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         :return the contents of the config file
         """
 
-        print(path)
         if super(InventoryModule, self).verify_file(path):
             if path.endswith(("equinix_metal.yml", "equinix_metal.yaml")):
-                print("success")
                 return True
-        print("failure")
         self.display.debug(
             "equinix_metal inventory filename must end with 'equinix_metal.yml' or 'equinix_metal.yaml'"
         )
@@ -255,8 +252,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         :return A list of device dictionaries
         """
         try:
+            print("a")
             manager = self._connect()
+            print("b")
             devices = manager.list_all_devices(project_id=project_id)
+            print("c")
             return [self._get_host_info_dict_from_device(device) for device in devices]
         except Exception as e:
             print(project_id)
