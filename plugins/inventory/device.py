@@ -258,7 +258,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             devices = manager.list_all_devices(project_id=project_id)
             print("c")
             return [self._get_host_info_dict_from_device(device) for device in devices]
-        except Exception as e:
+        except ImportError as e:
             print(project_id)
             raise AnsibleError(
                 "Failed to query devices from Equinix Metal API", orig_exc=e
