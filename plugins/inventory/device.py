@@ -247,6 +247,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if not project_ids:
             try:
                 pages = list(self._request("/projects"))
+                print(len(pages))
                 manager = self._connect()
                 projects = manager.list_projects()
                 project_ids = [project.id for project in projects]
