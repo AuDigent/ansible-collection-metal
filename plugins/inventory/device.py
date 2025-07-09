@@ -108,11 +108,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         :param path: the path to the inventory config file
         :return the contents of the config file
         """
-        print("hello world")
 
+        print(path)
         if super(InventoryModule, self).verify_file(path):
             if path.endswith(("equinix_metal.yml", "equinix_metal.yaml")):
+                print("success")
                 return True
+        print("failure")
         self.display.debug(
             "equinix_metal inventory filename must end with 'equinix_metal.yml' or 'equinix_metal.yaml'"
         )
