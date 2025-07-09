@@ -247,7 +247,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if not project_ids:
             try:
                 pages = list(self._request("/projects"))
-                print(len(pages))
+                self.display.warn(len(pages))
                 # projects = manager.list_projects()
                 # project_ids = [project.id for project in projects]
             except Exception as e:
@@ -268,7 +268,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         :return A list of device dictionaries
         """
         try:
-            print(project_id)
             manager = self._connect()
             devices = manager.list_all_devices(project_id=project_id)
             return [self._get_host_info_dict_from_device(device) for device in devices]
