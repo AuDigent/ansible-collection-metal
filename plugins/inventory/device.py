@@ -90,6 +90,8 @@ try:
 except ImportError:
     HAS_TRUSTSTORE = False
 
+import requests
+
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     NAME = "equinix.metal.device"
@@ -108,7 +110,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         :param path: the path to the inventory config file
         :return the contents of the config file
         """
-
         if super(InventoryModule, self).verify_file(path):
             if path.endswith(("equinix_metal.yml", "equinix_metal.yaml")):
                 return True
@@ -226,14 +227,29 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         )
         return manager
 
+    def _request(self, uri):
+        base_url = "https://api.equinix.com/metal/v1"
+        next_url = f"{base_url}{uri}"
+        headers = {"X-Auth-Token": str(self.api_token)}
+        while next_url is not None:
+            resp = requests.get(next_url, headers=headers)
+            data = resp.json()
+            if data["meta"]["next"] is None:
+                next_url = None
+            else:
+                next_url = f"{base_url}{data['meta']['next']['href']}"
+            # yield the page, let the caller handle the results
+            yield (data)
+
     def _get_project_ids(self):
         project_ids = self.get_option("projects")
 
         if not project_ids:
             try:
-                manager = self._connect()
-                projects = manager.list_projects()
-                project_ids = [project.id for project in projects]
+                pages = list(self._request("/projects"))
+                print(len(pages))
+                # projects = manager.list_projects()
+                # project_ids = [project.id for project in projects]
             except Exception as e:
                 raise AnsibleError(
                     "Failed to query projects from Equinix Metal API", orig_exc=e
@@ -252,14 +268,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         :return A list of device dictionaries
         """
         try:
-            print("a")
-            manager = self._connect()
-            print("b")
-            devices = manager.list_all_devices(project_id=project_id)
-            print("c")
-            return [self._get_host_info_dict_from_device(device) for device in devices]
-        except ImportError as e:
             print(project_id)
+            manager = self._connect()
+            devices = manager.list_all_devices(project_id=project_id)
+            return [self._get_host_info_dict_from_device(device) for device in devices]
+        except Exception as e:
             raise AnsibleError(
                 "Failed to query devices from Equinix Metal API", orig_exc=e
             )
