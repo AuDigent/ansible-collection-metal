@@ -237,21 +237,23 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if data["meta"]["next"] is None:
                 next_url = None
             else:
-                # next_url = f"{base_url}{data['meta']['next']['href']}"
-                next_url = None
-            # yield the page, let the caller handle the results
-            yield (data)
+                next_url = f"{base_url}{data['meta']['next']['href']}"
+            yield data
 
     def _get_project_ids(self):
         project_ids = self.get_option("projects")
 
         if not project_ids:
             try:
-                pages = list(self._request("/projects"))
-                print(len(pages))
-                manager = self._connect()
-                projects = manager.list_projects()
-                project_ids = [project.id for project in projects]
+                project_ids = [
+                    y["id"]
+                    for x in list(self._request("/projects"))
+                    for y in x["projects"]
+                ]
+
+                # manager = self._connect()
+                # projects = manager.list_projects()
+                # project_ids = [project.id for project in projects]
             except Exception as e:
                 raise AnsibleError(
                     "Failed to query projects from Equinix Metal API", orig_exc=e
