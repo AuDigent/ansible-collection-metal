@@ -90,6 +90,8 @@ try:
 except ImportError:
     HAS_TRUSTSTORE = False
 
+import requests
+
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     NAME = "equinix.metal.device"
@@ -225,14 +227,33 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         )
         return manager
 
+    def _request(self, uri):
+        base_url = "https://api.equinix.com/metal/v1"
+        next_url = f"{base_url}{uri}"
+        headers = {"X-Auth-Token": str(self.api_token)}
+        while next_url is not None:
+            resp = requests.get(next_url, headers=headers)
+            data = resp.json()
+            if data["meta"]["next"] is None:
+                next_url = None
+            else:
+                next_url = f"{base_url}{data['meta']['next']['href']}"
+            yield data
+
     def _get_project_ids(self):
         project_ids = self.get_option("projects")
 
         if not project_ids:
             try:
-                manager = self._connect()
-                projects = manager.list_projects()
-                project_ids = [project.id for project in projects]
+                project_ids = [
+                    y["id"]
+                    for x in list(self._request("/projects"))
+                    for y in x["projects"]
+                ]
+
+                # manager = self._connect()
+                # projects = manager.list_projects()
+                # project_ids = [project.id for project in projects]
             except Exception as e:
                 raise AnsibleError(
                     "Failed to query projects from Equinix Metal API", orig_exc=e
